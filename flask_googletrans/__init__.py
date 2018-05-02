@@ -2,7 +2,6 @@ from googletrans import Translator as google_translator
 from json import dumps
 from os.path import isfile
 from os import name as OSName
-from atexit import register
 
 
 class translator (object):
@@ -45,7 +44,6 @@ class translator (object):
                     self.loadCache()
                 else:
                     self.cacheIt()
-                # register(self.cacheIt) # make sure STORAGE is cached before exit
         else:
             raise(AttributeError('must pass string path to Translator(file_path=)'))
         @self.app.context_processor
