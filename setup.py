@@ -1,0 +1,39 @@
+"""
+Flask-Googletrans
+-------------
+A Flask extension to add Googletrans google translation to the template 
+with ability to cache translation to external .py file
+"""
+from setuptools import setup
+
+
+setup(
+    name='Flask-Googletrans',
+    version='0.1',
+    url='https://github.com/mrf345/flask_googletrans/',
+    download_url='https://github.com/mrf345/flask_googletrans/archive/0.1.tar.gz',
+    license='MIT',
+    author='Mohamed Feddad',
+    author_email='mrf345@gmail.com',
+    description='Googletrans google translation flask extension',
+    long_description=__doc__,
+    py_modules=['translator'],
+    packages=['flask_googletrans'],
+    zip_safe=False,
+    include_package_data=True,
+    platforms='any',
+    install_requires=[
+        'Flask',
+        'googletrans'
+    ],
+    keywords=['flask', 'extension', 'google', 'translate', 'googletrans'],
+    classifiers=[
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules'
+    ]
+)
