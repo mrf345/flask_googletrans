@@ -1,6 +1,6 @@
 <h1 align='center'> flask_googletrans </h1>
 <h3 align='center'>
-    A Flask extension to add Googletrans google translation to the template with ability to cache translation to external .py file.
+    A Flask extension to add Googletrans google translation to the template with ability to cache translation to external pretty .json file.
 </h3>
 
 ## Install:
@@ -46,7 +46,7 @@ translate(text='something', src='en', dest=['fr', 'it', 'es'])
 ```
 
 #### - Caching:
-> Caching stores all the translated text in one big dictionary with the translated text as a key in a separate .py file
+> Caching stores all the translated text in one big dictionary with the translated text as a key in a separate .json file
 ```python
 ts = translator(
     app=app,
