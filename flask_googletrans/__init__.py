@@ -1,5 +1,5 @@
 from googletrans import Translator as google_translator
-from json import dumps
+from json import dumps, load
 from os.path import isfile
 from os import name as OSName
 
@@ -9,16 +9,19 @@ class translator (object):
         self,
         app=None,
         cache=False,
-        file_name='gt_cached.py'):
+        fail_safe=False,
+        file_name='gt_cached.json'):
         """
-        Googletrans flask extension with caching translation in .py file
+        Googletrans flask extension with caching translation in .json file
         @param: app Instance of the Flask app (default: False)
         @param: cache To enable or disable caching translation (default: False)
-        @param: file_name Name of the python file to store the cached translation in
-        (default: 'gt_cached.py')
+        @param: fail_safe returns original text if fetching translation failed (default: False)
+        @param: file_name Name of the json file to store the cached translation in
+        (default: 'gt_cached.json')
         """
         self.app = app
         self.cache = cache
+        self.fail_safe = fail_safe
         self.file_name = file_name
         self.full_path = __path__[0]
         self.full_path += "\\" if OSName == 'nt' else '/' + self.file_name
@@ -78,30 +81,58 @@ class translator (object):
                 toReturn = {}
                 for dl in dest:
                     if dl in self.STORAGE[text].keys():
-                        toReturn[dl] = self.STORAGE[text][dl].decode('utf8')
+                        toReturn[dl] = self.STORAGE[text][dl]
                     else:
-                        toReturn[dl] = translator.translate(
-                            text,
-                            dl,
-                            src
-                        ).text
+                        try:
+                            toReturn[dl] = translator.translate(
+                                text,
+                                dl,
+                                src
+                            ).text
+                        except Exception as e:
+                            if self.fail_safe:
+                                return text
+                            else:
+                                raise(e)
                 if toReturn != self.STORAGE[text]:
                     self.STORAGE[text] = toReturn
                     self.cacheIt()
                 return toReturn
             else:
-                return self.STORAGE[text][dest[0]].decode('utf8')
+                if dest[0] not in self.STORAGE[text].keys():
+                    try:
+                        toRetTra = translator.translate(
+                            text,
+                            dest[0],
+                            src
+                        ).text
+                        self.STORAGE[text][dest[0]] = toRetTra
+                        self.cacheIt()
+                        return toRetTra
+                    except Exception as e:
+                        if self.fail_safe:
+                            return text
+                        else:
+                            raise(e)
+                else:
+                    return self.STORAGE[text][dest[0]]
         else:
             toStore = {text: {
                 src: text
             }}
             for dl in dest:
-                translation = translator.translate(
-                    text,
-                    dl,
-                    src
-                )
-                toStore[text][dl] = translation.text
+                try:
+                    translation = translator.translate(
+                        text,
+                        dl,
+                        src
+                    )
+                    toStore[text][dl] = translation.text
+                except Exception as e:
+                    if self.fail_safe:
+                        return text
+                    else:
+                        raise(e)
             if self.cache:
                 self.STORAGE[text] = toStore[text]
                 self.cacheIt()
@@ -116,7 +147,9 @@ class translator (object):
         function to try loading cache file
         """
         try:
-            self.STORAGE = __import__(self.file_name.split('.py')[0]).STORAGE
+            # self.STORAGE = __import__(self.file_name.split('.py')[0]).STORAGE
+            with open(self.file_name, 'r+') as file:
+                self.STORAGE = load(file)
         except Exception:
             raise(IOError('Translator() failed to load cached file ' + self.file_name))
 
@@ -125,7 +158,7 @@ class translator (object):
         """
         function to overwrite the cached translation file
         """
+        jsonData = dumps(self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True).decode('unicode-escape').encode('utf8')
         with open(self.file_name, 'w+') as file:
-            file.write("# -*- coding: utf-8 -*-\n" + "STORAGE = " + dumps(self.STORAGE
-            ).decode('unicode-escape').encode('utf8') + "\n")
+            file.write(jsonData)
         self.loadCache()

@@ -51,7 +51,7 @@ translate(text='something', src='en', dest=['fr', 'it', 'es'])
 ts = translator(
     app=app,
     cache=True, # To enable caching by default is disabled
-    file_name='gt_cache.py' # To change the default name of the cache file
+    file_name='gt_cache.json' # To change the default name of the cache file
 )
 ```
 
