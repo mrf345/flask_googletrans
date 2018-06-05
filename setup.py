@@ -9,9 +9,9 @@ from setuptools import setup
 
 setup(
     name='Flask-Googletrans',
-    version='0.2',
+    version='0.3',
     url='https://github.com/mrf345/flask_googletrans/',
-    download_url='https://github.com/mrf345/flask_googletrans/archive/0.2.tar.gz',
+    download_url='https://github.com/mrf345/flask_googletrans/archive/0.3.tar.gz',
     license='MIT',
     author='Mohamed Feddad',
     author_email='mrf345@gmail.com',

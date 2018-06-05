@@ -10,18 +10,21 @@ class translator (object):
         app=None,
         cache=False,
         fail_safe=False,
+        skip_app=False,
         file_name='gt_cached.json'):
         """
         Googletrans flask extension with caching translation in .json file
         @param: app Instance of the Flask app (default: False)
         @param: cache To enable or disable caching translation (default: False)
         @param: fail_safe returns original text if fetching translation failed (default: False)
+        @param: skip_app to skip checking app for .init_app() (default: False)
         @param: file_name Name of the json file to store the cached translation in
         (default: 'gt_cached.json')
         """
         self.app = app
         self.cache = cache
         self.fail_safe = fail_safe
+        self.skip_app = skip_app
         self.file_name = file_name
         self.full_path = __path__[0]
         self.full_path += "\\" if OSName == 'nt' else '/' + self.file_name
@@ -37,7 +40,7 @@ class translator (object):
             'pt', 'pa', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sd', 'si',
             'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tg', 'ta', 'te', 'th',
             'tr', 'uk', 'ur', 'uz', 'vi', 'cy', 'xh', 'yi', 'yo', 'zu', 'fil']
-        if self.app is None:
+        if self.app is None and not self.skip_app:
             raise(AttributeError('must pass app instance to Translator(app=)'))
         if not isinstance(self.cache, bool):
             raise(AttributeError('must pass boolean to Translator(cache=)'))
@@ -49,11 +52,19 @@ class translator (object):
                     self.cacheIt()
         else:
             raise(AttributeError('must pass string path to Translator(file_path=)'))
+        if not self.skip_app:
+            @self.app.context_processor
+            def inject_vars():
+                """ to inject translate function into the template """
+                return dict(translate=self.translate)
+
+    def init_app(self, app):
+        """ to load app after the fact """
+        self.app = app
         @self.app.context_processor
         def inject_vars():
             """ to inject translate function into the template """
             return dict(translate=self.translate)
-
 
     def translate(
         self,
@@ -66,7 +77,7 @@ class translator (object):
         @param: src Language to translate text from (default: 'en')
         @param: dest List of languages to return translated text in (default: ['fr'])
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) and not isinstance(text, unicode):
             raise(AttributeError('translate(text=) you must pass string of text to be translated'))
         if src not in self.languages:
             raise(AttributeError('translate(src=) passed language is not supported: ' + src))
