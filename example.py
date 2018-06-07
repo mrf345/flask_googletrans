@@ -17,12 +17,10 @@ register(cleanUp)
 
 @app.route('/')
 def root():
-    # for m in flashMessages:
-    #     ts.translate(text=m, src='en', dest=['fr', 'es', 'ar', 'it'])
     with open('index.html', 'w+') as file:
         file.write("<h1 align='center'>{{ translate(text='the new thing which is a long one jus to see', dest=['fr', 'it', 'es', 'ar'])['ar'] }}</h1>")
         file.write("<h1 align='center'>{{ translate(text='nothing', dest=['fr', 'it', 'es', 'ar'])['ar'] }}</h1>")
-        file.write("<h1 align='center'>{{ translate(text='the real thing', dest=['fr', 'ar'])['fr'] }}</h1>")
+        file.write("<h1 align='center'>{{ translate(text='the real thing', dest=['fdsfds']) }}</h1>")
     return render_template('index.html')
 
 

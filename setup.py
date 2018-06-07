@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Googletrans',
-    version='0.3',
+    version='0.4',
     url='https://github.com/mrf345/flask_googletrans/',
     download_url='https://github.com/mrf345/flask_googletrans/archive/0.3.tar.gz',
     license='MIT',

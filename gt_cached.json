@@ -1,0 +1,21 @@
+{
+    "": {},
+    "nothing": {
+        "ar": "لا شيئ",
+        "es": "nada",
+        "fr": "rien",
+        "it": "Niente"
+    },
+    "the new thing which is a long one jus to see": {
+        "ar": "الشيء الجديد الذي هو أمر واحد طويل لنرى",
+        "es": "la nueva cosa que es un largo jus para ver",
+        "fr": "la nouvelle chose qui est longue à voir",
+        "it": "la nuova cosa che è lunga da vedere"
+    },
+    "the real thing": {
+        "ar": "الشيء الحقيقي",
+        "en": "the real thing",
+        "es": "la cosa real",
+        "fr": "la chose réelle"
+    }
+}

@@ -85,7 +85,10 @@ class translator (object):
             raise(AttributeError('translate(dest=) you must pass list of strings of supported languages'))
         for dl in dest:
             if dl not in self.languages:
-                raise(AttributeError('translate(dest=[]) passed language is not supported: ' + dl))
+                if self.fail_safe:
+                    return text
+                else:
+                    raise(AttributeError('translate(dest=[]) passed language is not supported: ' + str(dl)))
         translator = google_translator()
         if self.cache and text in self.STORAGE.keys():
             if len(dest) > 1:
@@ -158,7 +161,6 @@ class translator (object):
         function to try loading cache file
         """
         try:
-            # self.STORAGE = __import__(self.file_name.split('.py')[0]).STORAGE
             with open(self.file_name, 'r+') as file:
                 self.STORAGE = load(file)
         except Exception:
@@ -169,7 +171,9 @@ class translator (object):
         """
         function to overwrite the cached translation file
         """
-        jsonData = dumps(self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True).decode('unicode-escape').encode('utf8')
+        jsonData = dumps(
+            self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True
+        ).decode('unicode-escape').encode('utf8')
         with open(self.file_name, 'w+') as file:
             file.write(jsonData)
         self.loadCache()
