@@ -5,7 +5,7 @@ from os import remove
 
 
 app = Flask(__name__, template_folder='.')
-ts = translator(app=app, cache=True, fail_safe=True)
+ts = translator(app=app, cache=True, fail_safe=True, route=True)
 
 def cleanUp():
     try:

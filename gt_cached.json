@@ -6,6 +6,16 @@
         "fr": "rien",
         "it": "Niente"
     },
+    "something to read": {
+        "en": "something to read",
+        "fr": "quelque chose à lire"
+    },
+    "something to read something else to, try as well as that.": {
+        "ar": "شيء لقراءة شيء آخر ، حاول كذلك.",
+        "es": "algo para leer algo más, intenta tan bien como eso.",
+        "fr": "quelque chose à lire quelque chose d'autre, essayez aussi bien que cela.",
+        "it": "qualcosa da leggere qualcos'altro, prova pure così."
+    },
     "the new thing which is a long one jus to see": {
         "ar": "الشيء الجديد الذي هو أمر واحد طويل لنرى",
         "es": "la nueva cosa que es un largo jus para ver",

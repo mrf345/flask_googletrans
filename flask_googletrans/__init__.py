@@ -2,16 +2,19 @@ from googletrans import Translator as google_translator
 from json import dumps, load
 from os.path import isfile
 from os import name as OSName
+from flask import jsonify
 
 
 class translator (object):
+
     def __init__(
         self,
         app=None,
         cache=False,
         fail_safe=False,
         skip_app=False,
-        file_name='gt_cached.json'):
+        file_name='gt_cached.json',
+        route=False):
         """
         Googletrans flask extension with caching translation in .json file
         @param: app Instance of the Flask app (default: False)
@@ -20,6 +23,8 @@ class translator (object):
         @param: skip_app to skip checking app for .init_app() (default: False)
         @param: file_name Name of the json file to store the cached translation in
         (default: 'gt_cached.json')
+        @param: route to open up a route on /gtran/<fromL>/<toL>/<text> to fetch translation
+        as json response {translation: 'text ...'} (default: False)
         """
         self.app = app
         self.cache = cache
@@ -29,6 +34,7 @@ class translator (object):
         self.full_path = __path__[0]
         self.full_path += "\\" if OSName == 'nt' else '/' + self.file_name
         self.STORAGE = {'': {}}
+        self.route = route
         self.languages = [
             'af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs',
             'bg', 'ca', 'ceb', 'ny', 'zh-cn', 'zh-tw', 'co', 'hr', 'cs',
@@ -57,6 +63,9 @@ class translator (object):
             def inject_vars():
                 """ to inject translate function into the template """
                 return dict(translate=self.translate)
+        if self.route:
+            self.gtranRoute()
+
 
     def init_app(self, app):
         """ to load app after the fact """
@@ -65,6 +74,7 @@ class translator (object):
         def inject_vars():
             """ to inject translate function into the template """
             return dict(translate=self.translate)
+
 
     def translate(
         self,
@@ -177,3 +187,14 @@ class translator (object):
         with open(self.file_name, 'w+') as file:
             file.write(jsonData)
         self.loadCache()
+
+
+    def gtranRoute(self):
+        """ to setup a route on /gtran/<froml>/<tol>/<text> for dynamic fetching """
+        @self.app.route('/gtran/<froml>/<tol>/<text>')
+        def gttsRoute(froml, tol, text):
+            return jsonify(translation=self.translate(
+                text.encode('utf8'),
+                froml.encode('utf8'),
+                [tol.encode('utf8')],
+                ).replace('%5C', '/'))

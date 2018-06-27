@@ -53,7 +53,8 @@ ts = translator(
     cache=True, # To enable caching by default is disabled
     fail_safe=False, # returns original text if fetching translation failed
     skip_app=False, # to skip checking app for .init_app()
-    file_name='gt_cache.json' # To change the default name of the cache file
+    file_name='gt_cache.json', # To change the default name of the cache file
+    route=False # opens up a route on /gtran/<fromL>/<toL>/<text> to fetch translation as json response {translation: 'text ...'}
 )
 ```
 
