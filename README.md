@@ -1,4 +1,7 @@
 <h1 align='center'> flask_googletrans </h1>
+<p align='center'>
+<a href='https://travis-ci.com/mrf345/flask_googletrans'><img src='https://travis-ci.com/mrf345/flask_googletrans.svg?branch=master' /></a><a href='https://coveralls.io/github/mrf345/flask_googletrans?branch=master'><img src='https://coveralls.io/repos/github/mrf345/flask_googletrans/badge.svg?branch=master' alt='Coverage Status' /></a>
+</p>
 <h3 align='center'>
     A Flask extension to add Googletrans google translation to the template with ability to cache translation to external pretty .json file.
 </h3>
