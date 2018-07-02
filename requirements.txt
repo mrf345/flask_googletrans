@@ -1,0 +1,6 @@
+flask
+googletrans
+pytest
+pytest-cov
+coverage
+python-coveralls

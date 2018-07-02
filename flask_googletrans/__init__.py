@@ -3,6 +3,7 @@ from json import dumps, load
 from os.path import isfile
 from os import name as OSName
 from flask import jsonify
+from sys import version_info as V
 
 
 class translator (object):
@@ -87,7 +88,7 @@ class translator (object):
         @param: src Language to translate text from (default: 'en')
         @param: dest List of languages to return translated text in (default: ['fr'])
         """
-        if not isinstance(text, str) and not isinstance(text, unicode):
+        if not isinstance(text, str):
             raise(AttributeError('translate(text=) you must pass string of text to be translated'))
         if src not in self.languages:
             raise(AttributeError('translate(src=) passed language is not supported: ' + src))
@@ -99,7 +100,21 @@ class translator (object):
                     return text
                 else:
                     raise(AttributeError('translate(dest=[]) passed language is not supported: ' + str(dl)))
-        translator = google_translator()
+        if self.fail_safe:
+            T = google_translator()
+            class translatorC(object):
+                def translate(self, text, dest, src):
+                    try:
+                        return T.translate(
+                            text=text,
+                            dest=dest,
+                            src=src
+                        )
+                    except Exception:
+                        return text
+            translator = translatorC()
+        else:
+            translator = google_translator()
         if self.cache and text in self.STORAGE.keys():
             if len(dest) > 1:
                 toReturn = {}
@@ -107,37 +122,25 @@ class translator (object):
                     if dl in self.STORAGE[text].keys():
                         toReturn[dl] = self.STORAGE[text][dl]
                     else:
-                        try:
-                            toReturn[dl] = translator.translate(
-                                text,
-                                dl,
-                                src
-                            ).text
-                        except Exception as e:
-                            if self.fail_safe:
-                                return text
-                            else:
-                                raise(e)
+                        toReturn[dl] = translator.translate(
+                            text,
+                            dl,
+                            src
+                        ).text
                 if toReturn != self.STORAGE[text]:
                     self.STORAGE[text] = toReturn
                     self.cacheIt()
                 return toReturn
             else:
                 if dest[0] not in self.STORAGE[text].keys():
-                    try:
-                        toRetTra = translator.translate(
-                            text,
-                            dest[0],
-                            src
-                        ).text
-                        self.STORAGE[text][dest[0]] = toRetTra
-                        self.cacheIt()
-                        return toRetTra
-                    except Exception as e:
-                        if self.fail_safe:
-                            return text
-                        else:
-                            raise(e)
+                    toRetTra = translator.translate(
+                        text,
+                        dest[0],
+                        src
+                    ).text
+                    self.STORAGE[text][dest[0]] = toRetTra
+                    self.cacheIt()
+                    return toRetTra
                 else:
                     return self.STORAGE[text][dest[0]]
         else:
@@ -145,18 +148,12 @@ class translator (object):
                 src: text
             }}
             for dl in dest:
-                try:
-                    translation = translator.translate(
-                        text,
-                        dl,
-                        src
-                    )
-                    toStore[text][dl] = translation.text
-                except Exception as e:
-                    if self.fail_safe:
-                        return text
-                    else:
-                        raise(e)
+                translation = translator.translate(
+                    text,
+                    dl,
+                    src
+                )
+                toStore[text][dl] = translation.text
             if self.cache:
                 self.STORAGE[text] = toStore[text]
                 self.cacheIt()
@@ -183,7 +180,8 @@ class translator (object):
         """
         jsonData = dumps(
             self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True
-        ).decode('unicode-escape').encode('utf8')
+        )
+        jsonData = jsonData.decode('unicode-escape').encode('utf8') if V.major == 2 else jsonData
         with open(self.file_name, 'w+') as file:
             file.write(jsonData)
         self.loadCache()
@@ -194,7 +192,7 @@ class translator (object):
         @self.app.route('/gtran/<froml>/<tol>/<text>')
         def gttsRoute(froml, tol, text):
             return jsonify(translation=self.translate(
-                text.encode('utf8'),
-                froml.encode('utf8'),
-                [tol.encode('utf8')],
+                str(text),
+                str(froml),
+                [str(tol)],
                 ).replace('%5C', '/'))
