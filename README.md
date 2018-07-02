@@ -71,8 +71,7 @@ Function | Does
 
 
 #### - List of supported languages:
-```python
-{
+`{
     'af': 'afrikaans',
     'sq': 'albanian',
     'am': 'amharic',
@@ -179,9 +178,7 @@ Function | Does
     'zu': 'zulu',
     'fil': 'Filipino',
     'he': 'Hebrew'
-}
-
-```
+}`
 
 ## Credit:
 > - [Googletrans][1311353e]: Awesome free and unlimited python library that implements Google Translate API
