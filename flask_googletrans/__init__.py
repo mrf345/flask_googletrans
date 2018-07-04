@@ -4,6 +4,8 @@ from os.path import isfile
 from os import name as OSName
 from flask import jsonify
 from sys import version_info as V
+if V.major == 3:
+    unicode = bytes
 
 
 class translator (object):
@@ -88,14 +90,14 @@ class translator (object):
         @param: src Language to translate text from (default: 'en')
         @param: dest List of languages to return translated text in (default: ['fr'])
         """
-        if not isinstance(text, str):
+        if not isinstance(text, str) and not isinstance(text, unicode):
             raise(AttributeError('translate(text=) you must pass string of text to be translated'))
-        if src not in self.languages:
+        if str(src) not in self.languages:
             raise(AttributeError('translate(src=) passed language is not supported: ' + src))
         if not isinstance(dest, list):
             raise(AttributeError('translate(dest=) you must pass list of strings of supported languages'))
         for dl in dest:
-            if dl not in self.languages:
+            if str(dl) not in self.languages:
                 if self.fail_safe:
                     return text
                 else:
