@@ -1,5 +1,5 @@
 flask
-googletrans
+googletrans-temp
 pytest
 pytest-cov
 coverage
