@@ -63,25 +63,18 @@ class translator (object):
                     self.loadCache()
                 else:
                     self.cacheIt()
-        else:
+        else:  # pragma: nocover
             raise(AttributeError(
                 'must pass string path to Translator(file_path=)'))
         if not self.skip_app:
-            @self.app.context_processor
-            def inject_vars():
-                """ to inject translate function into the template """
-                return dict(translate=self.translate)
+            self.appLoading()
         if self.route:
             self.gtranRoute()
 
     def init_app(self, app):
         """ to load app after the fact """
         self.app = app
-
-        @self.app.context_processor
-        def inject_vars():
-            """ to inject translate function into the template """
-            return dict(translate=self.translate)
+        self.appLoading()
 
     def translate(
         self,
@@ -128,7 +121,7 @@ class translator (object):
                             dest=dest,
                             src=src
                         )
-                    except Exception:
+                    except Exception:  # pragma: nocover
                         return text
             translator = translatorC()
         else:
@@ -187,7 +180,7 @@ class translator (object):
         try:
             with open(self.file_name, 'r+') as file:
                 self.STORAGE = load(file)
-        except Exception:
+        except Exception:  # pragma: nocover
             raise(IOError(
                 'Translator() failed to load cached '
                 'file ' + self.file_name))
@@ -196,21 +189,19 @@ class translator (object):
         """
         function to overwrite the cached translation file
         """
-        def todo(self):
-            """ to execute in a thread to reduce latency """
-            jsonData = dumps(
-                self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True
-            )
-            jsonData = jsonData.decode(
-                'unicode-escape').encode('utf8') if V.major == 2 else jsonData
-            with open(self.file_name, 'w+') as file:
-                file.write(jsonData)
-            self.loadCache()
-        Thread(target=todo, args=(self,)).start()
+        jsonData = dumps(
+            self.STORAGE, indent=4, separators=(',', ': '), sort_keys=True
+        )
+        jsonData = jsonData.decode(
+            'unicode-escape').encode('utf8') if V.major == 2 else jsonData
+        with open(self.file_name, 'w+') as file:
+            file.write(jsonData)
+        self.loadCache()
 
     def gtranRoute(self):
         """ to setup a route on /gtran/<froml>/<tol>/<text> for dynamic
         fetching """
+
         @self.app.route('/gtran/<froml>/<tol>/<text>')
         def gttsRoute(froml, tol, text):
             return jsonify(translation=self.translate(
@@ -218,3 +209,18 @@ class translator (object):
                 str(froml),
                 [str(tol)],
                 ).replace('%5C', '/'))
+
+    def appLoading(self):
+        """ events to load flask app with """
+
+        @self.app.context_processor
+        def inject_vars():
+            """ to inject translate function into the template """
+            return dict(translate=self.translate)
+        if self.cache:
+
+            @self.app.after_request
+            def todo(resp):
+                """ to cache the new translation after the request is done """
+                self.cacheIt()
+                return resp

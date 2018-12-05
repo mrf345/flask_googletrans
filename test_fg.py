@@ -19,12 +19,14 @@ dirs = ['templates', 'static']
 translation = 'qualcosa da dire'
 translation_es = 'algo que decir'
 
+
 def toCleanUp():
     for d in dirs:
         if path.isdir(d):
             rmtree(d)
 
 register(toCleanUp)
+
 
 def toMimic(data):
     for d in dirs:
@@ -42,6 +44,7 @@ def toMimic(data):
 app = Flask(__name__)
 eng = translator(app=app, route=True, cache=True)
 
+
 @app.route('/translate')
 def tran():
     return render_template(
@@ -52,9 +55,11 @@ def tran():
         )
     )
 
+
 @fixture
 def client():
     app.config['TESTING'] = True
+    app.config['SKIP'] = 'yes'
     app.config['STATIC_FOLDER'] = 'static'
     app.config['SERVER_NAME'] = 'localhost'
     client = app.test_client()
@@ -62,10 +67,11 @@ def client():
 
 
 def test_translate_template_initApp(client):
-    eng.init_app(app)
+    eng.init_app(app=app)
     client.get('/translate').data
     resp = client.get('/translate').data
     assert resp.decode('utf8') == translation
+
 
 def test__GtranRoute(client):
     resp = loads(client.get(
@@ -75,6 +81,7 @@ def test__GtranRoute(client):
     )['translation']
     assert resp == translation
 
+
 def test_translate_single_new_dest(client):
     resp = eng.translate(
         text=text,
@@ -82,6 +89,7 @@ def test_translate_single_new_dest(client):
         dest=['es']
     )
     assert resp == translation_es
+
 
 def test_translate_multi(client):
     def toDoRaise():
@@ -109,6 +117,7 @@ def test_translate_multi(client):
     eng.cache = True
     eng.fail_safe = False
 
+
 def test_cache_translation(client):
     with open(eng.file_name, 'w+') as f:
         f.write('{"": {}}')
@@ -117,12 +126,14 @@ def test_cache_translation(client):
     resp = client.get('/translate').data
     assert resp.decode('utf8') == eng.STORAGE[text][dest]
 
+
 def test_cache_tanslation_false(client):
     try:
         eng.file_name = '200'
         eng.loadCache()
     except Exception as e:
         assert type(e) == IOError
+
 
 def test_translate_multi_new_mod(client):
     eng.STORAGE[text] = {'en': 'falsely modified'}
@@ -159,6 +170,7 @@ def test_translate_false_input(client):
         eng.translate(text=text, src=src, dest=['200'])
     except Exception as e:
         assert type(e) == AttributeError
+
 
 def test_translator_false_input(client):
     try:
