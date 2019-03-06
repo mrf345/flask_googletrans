@@ -17,7 +17,8 @@ class translator (object):
         fail_safe=False,
         skip_app=False,
         file_name='gt_cached.json',
-        route=False
+        route=False,
+        service_urls=['translate.google.com']
     ):
         """
         Googletrans flask extension with caching translation in .json file
@@ -42,6 +43,7 @@ class translator (object):
         self.full_path += "\\" if OSName == 'nt' else '/' + self.file_name
         self.STORAGE = {'': {}}
         self.route = route
+        self.service_urls = service_urls
         self.languages = [
             'af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs',
             'bg', 'ca', 'ceb', 'ny', 'zh-cn', 'zh-tw', 'co', 'hr', 'cs',
@@ -111,7 +113,7 @@ class translator (object):
                         'translate(dest=[]) passed language is not '
                         'supported: ' + str(dl)))
         if self.fail_safe:
-            T = google_translator()
+            T = google_translator(service_urls=self.service_urls)
 
             class translatorC(object):
                 def translate(self, text, dest, src):
@@ -125,7 +127,7 @@ class translator (object):
                         return text
             translator = translatorC()
         else:
-            translator = google_translator()
+            translator = google_translator(service_urls=self.service_urls)
         if self.cache and text in self.STORAGE.keys():
             if len(dest) > 1:
                 toReturn = {}
