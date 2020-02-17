@@ -1,22 +1,22 @@
-"""
-Flask-Googletrans
--------------
-A Flask extension to add Googletrans google translation to the template 
-with ability to cache translation to external pretty .json file
-"""
 from setuptools import setup
+from os import path
+
+with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'),
+          encoding='utf-8') as f:
+    long_description = f.read()
 
 
 setup(
     name='Flask-Googletrans',
     version='0.10',
     url='https://github.com/mrf345/flask_googletrans/',
-    download_url='https://github.com/mrf345/flask_googletrans/archive/0.8.tar.gz',
+    download_url='https://github.com/mrf345/flask_googletrans/archive/0.10.tar.gz',
     license='MIT',
     author='Mohamed Feddad',
     author_email='mrf345@gmail.com',
     description='Googletrans google translation flask extension',
-    long_description=__doc__,
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     py_modules=['translator'],
     packages=['flask_googletrans'],
     zip_safe=False,
