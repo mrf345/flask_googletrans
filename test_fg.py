@@ -25,6 +25,9 @@ def toCleanUp():
         if path.isdir(d):
             rmtree(d)
 
+    if path.isfile('200'):
+        remove('200')
+
 register(toCleanUp)
 
 
@@ -182,3 +185,17 @@ def test_translator_false_input(client):
     except Exception as e:
         assert type(e) == AttributeError
     remove(eng.file_name)
+
+
+def test_translate_failsafe(client):
+    eng.fail_safe = True
+    eng.service_urls = ['fail_translation_test.not']
+
+    resp = eng.translate(
+        text=text,
+        src=src,
+        dest=['en']
+    )
+
+    assert eng.errors != []
+    assert resp == text
