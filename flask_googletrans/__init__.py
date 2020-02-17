@@ -1,5 +1,6 @@
 from googletrans import Translator as google_translator
 from json import dumps, load
+from collections import namedtuple
 from os.path import isfile
 from os import name as OSName
 from flask import jsonify
@@ -55,6 +56,7 @@ class translator (object):
             'pt', 'pa', 'ro', 'ru', 'sm', 'gd', 'sr', 'st', 'sn', 'sd', 'si',
             'sk', 'sl', 'so', 'es', 'su', 'sw', 'sv', 'tg', 'ta', 'te', 'th',
             'tr', 'uk', 'ur', 'uz', 'vi', 'cy', 'xh', 'yi', 'yo', 'zu', 'fil']
+        self.errors = []
         if self.app is None and not self.skip_app:
             raise(AttributeError('must pass app instance to Translator(app=)'))
         if not isinstance(self.cache, bool):
@@ -114,6 +116,7 @@ class translator (object):
                         'supported: ' + str(dl)))
         if self.fail_safe:
             T = google_translator(service_urls=self.service_urls)
+            parent = self
 
             class translatorC(object):
                 def translate(self, text, dest, src):
@@ -123,8 +126,10 @@ class translator (object):
                             dest=dest,
                             src=src
                         )
-                    except Exception:  # pragma: nocover
-                        return text
+                    except Exception as error:  # pragma: nocover
+                        parent.errors.append(error)
+                        return namedtuple('FailsafeTranlsation',
+                                          ['text'])(text=text)
             translator = translatorC()
         else:
             translator = google_translator(service_urls=self.service_urls)
