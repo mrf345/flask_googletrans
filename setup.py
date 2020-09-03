@@ -8,9 +8,9 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'README.md'),
 
 setup(
     name='Flask-Googletrans',
-    version='0.10',
+    version='0.11',
     url='https://github.com/mrf345/flask_googletrans/',
-    download_url='https://github.com/mrf345/flask_googletrans/archive/0.10.tar.gz',
+    download_url='https://github.com/mrf345/flask_googletrans/archive/0.11.tar.gz',
     license='MIT',
     author='Mohamed Feddad',
     author_email='mrf345@gmail.com',

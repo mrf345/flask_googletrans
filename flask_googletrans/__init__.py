@@ -19,7 +19,8 @@ class translator (object):
         skip_app=False,
         file_name='gt_cached.json',
         route=False,
-        service_urls=['translate.google.com']
+        service_urls=['translate.google.com'],
+        readonly=False
     ):
         """
         Googletrans flask extension with caching translation in .json file
@@ -45,6 +46,7 @@ class translator (object):
         self.STORAGE = {'': {}}
         self.route = route
         self.service_urls = service_urls
+        self.readonly = readonly
         self.languages = [
             'af', 'sq', 'am', 'ar', 'hy', 'az', 'eu', 'be', 'bn', 'bs',
             'bg', 'ca', 'ceb', 'ny', 'zh-cn', 'zh-tw', 'co', 'hr', 'cs',
@@ -229,5 +231,6 @@ class translator (object):
             @self.app.after_request
             def todo(resp):
                 """ to cache the new translation after the request is done """
-                self.cacheIt()
+                if not self.readonly:
+                    self.cacheIt()
                 return resp
